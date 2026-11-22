@@ -40,12 +40,6 @@ Une étape seule : `python main.py --stage <nom>`.
 
 Tous les réglages sont dans `config.yaml`, validés au chargement (`src/config.py`). Graine fixée : `seed: 2025`.
 
-## Livrables
-
-* **Article** (5 pages) : [`docs/article.pdf`](docs/article.pdf)
-* **Code et résultats reproductibles** : ce dépôt
-* **Soutenance** : présentée à l'oral (support non publié)
-
 ## Structure
 
 ```
