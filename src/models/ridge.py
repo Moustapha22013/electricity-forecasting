@@ -15,7 +15,6 @@ to 0.83, phase 4) instead of letting them explode with opposite signs.
 """
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.pipeline import make_pipeline
@@ -41,10 +40,3 @@ def make_ridge(features: list[str], alpha: float = 10.0, pi_alpha: float = 0.2, 
     """`alpha` = L2 penalty of Ridge; `pi_alpha` = miscoverage of the prediction interval (0.2 -> 80 %)."""
     est = make_pipeline(FunctionTransformer(expand_design), StandardScaler(), Ridge(alpha=alpha))
     return FeatureForecaster(f"ridge_a{alpha:g}", est, features, alpha=pi_alpha, **kw)
-
-
-def ridge_coefficients(model: FeatureForecaster, X_sample: pd.DataFrame) -> pd.Series:
-    """Standardized coefficients (comparable across features) of a fitted ridge pipeline."""
-    pipe = model.model
-    names = expand_design(X_sample.head(1)).columns
-    return pd.Series(pipe[-1].coef_, index=names).sort_values(key=np.abs, ascending=False)

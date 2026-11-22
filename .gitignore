@@ -7,3 +7,7 @@ data/processed/*
 !data/processed/.gitkeep
 .ipynb_checkpoints/
 .pytest_cache/
+
+# docs/: only the article PDF is public; sources, slides, jury prep and roadmap stay local
+docs/*
+!docs/article.pdf

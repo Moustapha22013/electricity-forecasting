@@ -63,6 +63,11 @@ def run(cfg: dict) -> dict:
                       "best_causal_method_by_gap": policy,
                       "policy": {"short_gap_max_hours": short_max, "short_method": short_m, "long_method": long_m}}})
 
+    # the journal also goes to reports/ (versioned): data/processed/ is not published
+    import shutil
+    shutil.copyfile(Path(cfg["data"]["processed_dir"]) / "preprocessing_log.json",
+                    Path(cfg["reports"]["dir"]) / "02_preprocessing_log.json")
+
     # --- summary by split (how much of each split is observed) ---
     dev_end = pd.Timestamp(cfg["split"]["dev_end"])
     split = pd.Series(pd.cut(h.index, [h.index.min() - pd.Timedelta("1h"), train_end, dev_end, h.index.max()],

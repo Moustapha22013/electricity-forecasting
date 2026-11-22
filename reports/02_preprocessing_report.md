@@ -1,6 +1,6 @@
 # Phase 2 — Préparation des données
 
-*Commande : `python main.py --stage preprocess` · journal : `data/processed/preprocessing_log.json` · sortie : `data/processed/hourly.csv` · tests : `tests/test_preprocessing.py` (16 tests au total, tous OK).*
+*Commande : `python main.py --stage preprocess` · journal : `reports/02_preprocessing_log.json` (copie versionnée de `data/processed/preprocessing_log.json`) · sortie : `data/processed/hourly.csv` · tests : `tests/test_preprocessing.py` (16 tests au total, tous OK).*
 
 ## 0. Principes
 

@@ -17,6 +17,8 @@ Limites rapportées sans correction : couverture de 76,8 % au lieu de 80 %, sous
 
 ## Lancer le projet (une seule commande)
 
+**Prérequis : Python 3.14.** L'environnement figé (`requirements.lock.txt`) utilise des versions récentes (numpy 2.5, pandas 3.1) qui demandent Python ≥ 3.14 ; il n'a pas été testé avec une version plus ancienne.
+
 ```bash
 python3 -m venv .venv
 ./.venv/bin/pip install -r requirements.lock.txt   # environnement exact (Python 3.14)
@@ -40,11 +42,9 @@ Tous les réglages sont dans `config.yaml`, validés au chargement (`src/config.
 
 ## Livrables
 
-* **Article** (5 pages) : [`docs/article.pdf`](docs/article.pdf), source [`docs/article.md`](docs/article.md)
-* **Soutenance** (12 diapositives, 10 min, notes de l'orateur) : [`docs/soutenance.pptx`](docs/soutenance.pptx)
-* **Questions probables du jury** : [`docs/questions_jury.md`](docs/questions_jury.md)
-
-Reconstruire l'article et les diapositives : `pip install -r requirements-docs.txt && python docs/build_docs.py`.
+* **Article** (5 pages) : [`docs/article.pdf`](docs/article.pdf)
+* **Code et résultats reproductibles** : ce dépôt
+* **Soutenance** : présentée à l'oral (support non publié)
 
 ## Structure
 
@@ -57,22 +57,26 @@ src/models/          naïfs, SARIMA, modèle à variables générique, Ridge, bo
 src/evaluation/      métriques, validation glissante (pare-feu), étapes 3, 5, 6
 tests/               35 tests (causalité, pare-feu, verrou, métriques)
 notebooks/           6 notebooks de lecture (appellent src/, aucun calcul propre)
-reports/             rapports détaillés par phase, chiffres (JSON), figures
-docs/                feuille de route, article, soutenance, questions du jury
+reports/             rapports détaillés par phase, chiffres (JSON), journal de préparation, figures
+docs/                article (PDF)
 ```
 
 ## Données
 
 * Source : https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption
 * Archive vérifiée par SHA-256 (`config.yaml`). Les données ne sont **pas** versionnées : `main.py` les télécharge.
+* Licence des données : CC BY 4.0 (UCI Machine Learning Repository) — Hébrail, G., Bérard, A. (2012). *Individual Household Electric Power Consumption*. https://doi.org/10.24432/C58K54
 * Découpage chronologique figé avant toute modélisation : train → 30/11/2009 · dev → 31/05/2010 · test → 26/11/2010.
 
 ## Rapports détaillés
 
-* [Feuille de route et décisions](docs/ROADMAP.md)
 * [Phase 1 : diagnostic des données](reports/01_data_quality_report.md)
 * [Phase 2 : préparation des données](reports/02_preprocessing_report.md)
 * [Phase 3 : baselines et protocole d'évaluation](reports/03_baselines_report.md)
 * [Phase 4 : variables](reports/04_features_report.md)
 * [Phase 5 : Ridge, boosting, ablation, revue des variables](reports/05_models_report.md)
 * [Phase 6 : évaluation finale sur le test](reports/06_test_report.md)
+
+## Licence
+
+Code sous licence MIT (voir [`LICENSE`](LICENSE)). Les données restent sous leur licence d'origine (CC BY 4.0).

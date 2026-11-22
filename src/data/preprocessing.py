@@ -210,20 +210,6 @@ def select_fill_policy(scores: pd.DataFrame) -> dict[int, str]:
     return {int(L): str(scores.loc[L, CAUSAL_METHODS].astype(float).idxmin()) for L in scores.index}
 
 
-def gap_lengths_of(y: pd.Series) -> pd.Series:
-    """For each missing hour, the total length (h) of the gap it belongs to; NaN elsewhere.
-
-    ANALYSIS ONLY — not causal (the length is known only when the gap ends).
-    """
-    miss = y.isna().to_numpy()
-    edges = np.diff(np.r_[0, miss.astype(int), 0])
-    starts, ends = np.flatnonzero(edges == 1), np.flatnonzero(edges == -1)
-    out = np.full(len(y), np.nan)
-    for s, e in zip(starts, ends):
-        out[s:e] = e - s
-    return pd.Series(out, index=y.index)
-
-
 def causal_fill(y: pd.Series, short_max_h: int, short_method: str, long_method: str,
                 log: PrepLog | None = None) -> tuple[pd.Series, pd.Series]:
     """Fill gaps <= short_max_h with `short_method`, longer ones with `long_method`.
@@ -267,7 +253,7 @@ def build_hourly(raw: pd.DataFrame, min_valid: int, short_max_h: int, short_meth
     h = aggregate_hourly(m, log)
     h = apply_validity_rule(h, min_valid, log)
     h["energy_filled"], h["fill_method"] = causal_fill(h["energy_kwh"], short_max_h, short_method, long_method, log)
-    # NB: total gap length (gap_lengths_of) is deliberately NOT stored: it is only known once the
+    # NB: the total length of a gap is deliberately NOT stored: it is only known once the
     # gap is over, so it must never become a feature.
     return h, log
 
