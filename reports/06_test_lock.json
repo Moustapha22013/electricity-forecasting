@@ -1,0 +1,45 @@
+{
+  "final_sha256": "a0cf9ce2e774bb425439e1ab1eb05cd24472374c5de137d591578bcf83a9e8c4",
+  "first_run": "2026-11-22T12:07:03",
+  "final": {
+    "test_start": "2010-06-01 00:00:00",
+    "selected_model": "gbm",
+    "feature_config": "4_lags+rolling+calendar",
+    "gbm_params": {
+      "loss": "absolute_error",
+      "learning_rate": 0.05,
+      "max_iter": 300,
+      "max_leaf_nodes": 63
+    },
+    "references": {
+      "naive_24": {},
+      "sarima": {
+        "order": [
+          1,
+          0,
+          1
+        ],
+        "seasonal": [
+          0,
+          1,
+          1
+        ],
+        "transform": "none"
+      },
+      "ridge": {
+        "alpha": 0.1,
+        "feature_config": "4_lags+rolling+calendar"
+      }
+    },
+    "protocol": {
+      "fold_days": 28,
+      "gap_hours": 24,
+      "calib_days": 91,
+      "alpha": 0.2
+    },
+    "report_without_correction": [
+      "bias",
+      "coverage"
+    ]
+  }
+}

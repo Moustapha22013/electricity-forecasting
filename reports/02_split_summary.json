@@ -1,0 +1,19 @@
+{
+  "by_split": {
+    "train": {
+      "hours": 25927,
+      "observed": 25781,
+      "filled": 146
+    },
+    "dev": {
+      "hours": 4368,
+      "observed": 4282,
+      "filled": 86
+    },
+    "test": {
+      "hours": 4294,
+      "observed": 4084,
+      "filled": 210
+    }
+  }
+}

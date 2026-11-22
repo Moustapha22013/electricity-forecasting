@@ -1,0 +1,79 @@
+# Central configuration. Every experimental choice is here; `src/config.py` validates it at load time.
+# Keys marked [fixed] are checked but only one value is implemented (anything else raises an error).
+seed: 2025
+
+data:
+  url: "https://archive.ics.uci.edu/static/public/235/individual+household+electric+power+consumption.zip"
+  zip_sha256: "9f84b46ade8a2d8e1286ec4b2b6c2987a45a755c59f263be3b3b3d10dfbda3ff"
+  raw_dir: "data/raw"
+  raw_file: "household_power_consumption.txt"
+  processed_dir: "data/processed"
+
+target: "Global_active_power"   # [fixed] kW (minute average); hourly target = energy in kWh
+
+# Chronological split, fixed BEFORE looking at any model result.
+# The test period is sealed: diagnosis that drives modelling choices uses train + dev only.
+split:
+  train_end: "2009-11-30 23:59:59"
+  dev_end:   "2010-05-31 23:59:59"
+  # test = 2010-06-01 -> end of data (2010-11-26)
+
+forecast:
+  horizon: 24          # [fixed] hours
+  issue_hour: 0        # [fixed] forecast issued at 00:00 for hours 00..23 of the same day (= "J+1" made the evening before)
+
+reports:
+  dir: "reports"
+  figures_dir: "reports/figures"
+
+# Phase 2 — selection PARAMETERS (criteria fixed in advance); selected VALUES are computed on train
+# and written to data/processed/preprocessing_log.json.
+preprocessing:
+  n_valid_grid: [5, 10, 15, 20, 30, 40, 45, 50, 55, 59]
+  n_hours_sim: 3000
+  max_ratio_to_naive_mae: 0.10      # hour estimate error must be <= 10 % of the naive-24 forecast error
+  gap_lengths_h: [1, 2, 3, 6, 12, 24, 48, 72, 120]
+  n_blocks: 300
+
+# Phase 3 — baselines. Selection on an inner validation = last `inner_days` of TRAIN.
+baselines:
+  alpha: 0.2                 # 80 % prediction intervals (phases 3 and 5)
+  inner_days: 91             # 2009-09-01 -> 2009-11-30
+  fold_days: 28              # dev: parameters re-estimated every 28 days
+  gap_hours: 24              # parameters fitted on data ending 24 h before the fold start
+  profile_grid:
+    weeks: [2, 4, 6, 8]
+    stat: ["mean", "median"]
+  sarima_fit_window_h: 1344      # 8 weeks
+  sarima_filter_window_h: 672    # 4 weeks of state update before each origin
+  sarima_grid:
+    order: [[1, 0, 0], [1, 0, 1], [2, 0, 0], [2, 0, 1]]
+    seasonal: [[1, 0, 0], [1, 0, 1], [0, 1, 1]]
+    transform: ["none", "log"]
+
+# Phase 5 — Ridge / gradient boosting. Tuning on the same inner train validation as phase 3.
+models:
+  calib_days: 91              # split-conformal calibration window (per hour) at the end of each fit history
+  ridge_alpha: [0.1, 1, 10, 100, 1000]
+  gbm_grid:
+    loss: ["squared_error", "absolute_error"]
+    learning_rate: [0.05, 0.1]
+    max_iter: [300]
+    max_leaf_nodes: [15, 63]
+
+# Phase 6 — PRE-REGISTERED final evaluation (frozen 2026-11-22 from dev results, BEFORE any test access).
+# The SHA-256 of this section (as loaded, comments excluded) is stored at the first test run; any later
+# change is refused. `selected_model` and `report_without_correction` are documentary (pre-registration
+# record, not read by the code); all other keys drive src/evaluation/run_test.py.
+# Bootstrap CIs use a fixed internal seed (0) in src/evaluation/metrics.py.
+final:
+  test_start: "2010-06-01 00:00:00"
+  selected_model: "gbm"
+  feature_config: "4_lags+rolling+calendar"
+  gbm_params: {loss: "absolute_error", learning_rate: 0.05, max_iter: 300, max_leaf_nodes: 63}
+  references:
+    naive_24: {}
+    sarima: {order: [1, 0, 1], seasonal: [0, 1, 1], transform: "none"}
+    ridge: {alpha: 0.1, feature_config: "4_lags+rolling+calendar"}
+  protocol: {fold_days: 28, gap_hours: 24, calib_days: 91, alpha: 0.2}
+  report_without_correction: ["bias", "coverage"]
